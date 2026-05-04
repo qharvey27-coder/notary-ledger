@@ -17,6 +17,7 @@ const signatureTitle = document.querySelector("#signatureTitle");
 const signatureCanvas = document.querySelector("#signaturePad");
 const signatureCtx = signatureCanvas.getContext("2d");
 const restoreFileInput = document.querySelector("#restoreFileInput");
+const termsModal = document.querySelector("#termsModal");
 
 const steps = [
   "Notarial act",
@@ -637,16 +638,16 @@ function renderLanding() {
         <div class="landing-actions">
           <button class="button gold" data-action="start-demo" type="button">Try Demo</button>
           <button class="button primary" data-action="mock-purchase" type="button">Buy Full Version</button>
-          <button class="button gold" data-auth-mode="signup" type="button">Create Account</button>
-          <button class="button secondary" data-auth-mode="login" type="button">Log In</button>
         </div>
+        <button class="text-link terms-link" data-action="open-terms" type="button">Refunds & Terms</button>
       </article>
       <article class="auth-card">
         <div class="section-heading"><div><p class="eyebrow">Local account</p><h2 id="authTitle">Create Account</h2></div></div>
         <label>Email<input id="authEmail" type="email" autocomplete="email" /></label>
         <label>Password<input id="authPassword" type="password" autocomplete="current-password" /></label>
         <button class="button primary full" data-action="auth-submit" data-mode="signup" type="button">Create Account</button>
-        <p class="prototype-note">Prototype login stores a password hash locally on this device. Production needs a real backend, password reset, rate limiting, and secure session management.</p>
+        <p class="account-note">Create an account to save your setup and activate your license.</p>
+        <button class="text-link account-switch" data-auth-mode="login" type="button">Already have an account? Log in</button>
       </article>
       <article class="feature-card"><strong>Demo mode</strong><span>Try one locked journal entry immediately without creating an account.</span></article>
       <article class="feature-card"><strong>One-time unlock</strong><span>Unlock unlimited entries, PDF export, encrypted backup, and restore/import.</span></article>
@@ -1322,7 +1323,22 @@ function mockPurchase() {
 }
 
 function initiateStripeCheckout() {
+  // Future Stripe setup note:
+  // The Stripe product description should include:
+  // "7-day refund period. One-time purchase. No subscription. Access may be revoked after refund. Support: digitalsolutionsco.us@gmail.com."
   alert("Future Stripe hook: create a checkout session, collect one-time payment, then issue a unique license key. For this prototype, use license key LOCAL-TEST-UNLOCK.");
+}
+
+function openTermsModal() {
+  termsModal.classList.add("open");
+  termsModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-active");
+}
+
+function closeTermsModal() {
+  termsModal.classList.remove("open");
+  termsModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-active");
 }
 
 async function validateLicenseKeyWithServer(licenseKey) {
@@ -1441,6 +1457,7 @@ function wireEvents() {
       submit.textContent = mode === "signup" ? "Create Account" : "Log In";
     }
     if (target.dataset.action === "auth-submit") await handleAuth(target.dataset.mode);
+    if (target.dataset.action === "open-terms") openTermsModal();
     if (target.dataset.action === "start-demo") startDemoSession();
     if (target.dataset.action === "finish-onboarding") finishOnboarding();
     if (target.dataset.action === "logout") logout();
@@ -1521,6 +1538,10 @@ function wireEvents() {
 
   ipadModeToggle.addEventListener("click", () => setIpadMode(!document.body.classList.contains("ipad-mode")));
   document.querySelector("#closeSignature").addEventListener("click", closeSignatureModal);
+  document.querySelector("#closeTerms").addEventListener("click", closeTermsModal);
+  termsModal.addEventListener("click", (event) => {
+    if (event.target === termsModal) closeTermsModal();
+  });
   document.querySelector("#clearSignature").addEventListener("click", clearSignature);
   document.querySelector("#confirmSignature").addEventListener("click", confirmSignature);
 

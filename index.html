@@ -34,16 +34,7 @@
         </div>
         <button id="ipadModeToggle" class="button secondary" type="button">iPad Testing Mode</button>
       </section>
-<section style="padding:20px; background:#f5f7fb; border-radius:10px; margin:15px;">
-  <h2>Notary Ledger</h2>
-  <p>One-time purchase tamper-proof digital notary journal. No subscription.</p>
 
-  <a href="YOUR_STRIPE_LINK" target="_blank">
-    <button style="padding:10px 20px; background:#0b1f3a; color:white; border:none; border-radius:6px;">
-      Buy Full Version
-    </button>
-  </a>
-</section>
       <nav class="app-nav" aria-label="Primary">
         <button class="nav-button active" data-view="dashboard" type="button">Home</button>
         <button class="nav-button" data-view="new-entry" type="button">New Entry</button>
@@ -53,12 +44,36 @@
 
       <main id="app"></main>
 
-     <footer class="app-footer">
-  Prototype only. Not legally certified. Designed for tamper-evident electronic journal recordkeeping review.
-</footer>
-      
+      <footer class="app-footer">
+        Prototype only. Not legally certified. Designed for tamper-evident electronic journal recordkeeping review.
+      </footer>
     </div>
     <input id="restoreFileInput" type="file" accept=".json,.njbackup,application/json" hidden />
+
+    <div id="termsModal" class="terms-modal" aria-hidden="true">
+      <div class="terms-card">
+        <div class="terms-header">
+          <h2>Refunds & Terms</h2>
+          <button id="closeTerms" class="button secondary" type="button">Close</button>
+        </div>
+        <section>
+          <h3>Refund Policy</h3>
+          <p>Notary Ledger offers a 7-day refund period from the date of purchase. If you are not satisfied, contact support at digitalsolutionsco.us@gmail.com.</p>
+        </section>
+        <section>
+          <h3>Access</h3>
+          <p>Access may be revoked after a refund is issued.</p>
+        </section>
+        <section>
+          <h3>Product</h3>
+          <p>Notary Ledger is a one-time purchase digital recordkeeping tool. No subscription is required.</p>
+        </section>
+        <section>
+          <h3>Disclaimer</h3>
+          <p>Users are responsible for ensuring compliance with their state and local notary laws. Notary Ledger does not provide legal advice or notarial authority.</p>
+        </section>
+      </div>
+    </div>
 
     <div id="signatureModal" class="signature-modal" aria-hidden="true">
       <div class="signature-card">
