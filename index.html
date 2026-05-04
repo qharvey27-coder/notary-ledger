@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Notary Journal" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>Notary Journal Prototype</title>
+    <title>Notary Ledger</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icon.svg" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -31,19 +31,9 @@
           <strong id="offlineStatus">Checking offline support...</strong>
           <span id="pwaStatus">Install from Safari Share, then Add to Home Screen.</span>
         </div>
-        <button id="ipadModeToggle" class="button secondary" type="button">iPad Testing Mode</button>
+        <button id="ipadModeToggle" class="button secondary" type="button">iPad Mode</button>
       </section>
 
-      <section style="padding:20px; background:#f5f7fb; border-radius:10px; margin:15px;">
-  <h2>Notary Ledger</h2>
-  <p>One-time purchase tamper-proof digital notary journal. No subscription.</p>
-
-  <a href="https://buy.stripe.com/7sY14p8R17249rl3uwgIo01" target="_blank">
-    <button style="padding:10px 20px; background:#0b1f3a; color:white; border:none; border-radius:6px;">
-      Buy Full Version
-    </button>
-  </a>
-</section>
       <nav class="app-nav" aria-label="Primary">
         <button class="nav-button active" data-view="dashboard" type="button">Home</button>
         <button class="nav-button" data-view="new-entry" type="button">New Entry</button>
@@ -54,7 +44,7 @@
       <main id="app"></main>
 
       <footer class="app-footer">
-        Not legally certified. Designed for tamper-evident electronic journal recordkeeping log.
+        Notary Ledger is a digital journal for secure recordkeeping.
       </footer>
     </div>
     <input id="restoreFileInput" type="file" accept=".json,.njbackup,application/json" hidden />

@@ -4,7 +4,7 @@ const SESSION_KEY = "notaryJournalPrototype.session.v1";
 const STORAGE_PREFIX = "notaryJournalPrototype.user.";
 const STORAGE_KEY = "notaryJournalPrototype.v3";
 const LEGACY_KEYS = ["notaryJournalPrototype.v2", "notaryJournalPrototype.v1"];
-const VALID_LICENSE_KEYS = ["NOTARY-FOUNDERS-2026", "LOCAL-TEST-UNLOCK"];
+const VALID_LICENSE_KEYS = ["FULL-UNLOCK-MODE"];
 
 const app = document.querySelector("#app");
 const nextEntryNumber = document.querySelector("#nextEntryNumber");
@@ -71,6 +71,10 @@ function hasSession() {
 
 function isDemoMode() {
   return currentUserEmail === "demo";
+}
+
+function hasPaid() {
+  return localStorage.getItem("hasPaid") === "true";
 }
 
 function loadState() {
@@ -296,7 +300,7 @@ async function registerServiceWorker() {
 
 function setIpadMode(enabled) {
   document.body.classList.toggle("ipad-mode", enabled);
-  ipadModeToggle.textContent = enabled ? "Exit iPad Testing Mode" : "iPad Testing Mode";
+  ipadModeToggle.textContent = enabled ? "Exit iPad Mode" : "iPad Mode";
   localStorage.setItem("notaryJournalPrototype.ipadMode", String(enabled));
 }
 
@@ -451,7 +455,7 @@ function validateDraft() {
 }
 
 async function lockEntry() {
-  if (!state.license?.unlocked && state.entries.length >= 1) {
+  if (!hasPaid() && state.entries.length >= 1) {
     alert("Purchase Notary Ledger to unlock unlimited entries, encrypted backups, restore/import, and PDF exports.");
     return;
   }
@@ -600,7 +604,7 @@ function participantSummary(participant) {
 }
 
 function renderShell() {
-  document.body.classList.toggle("signed-out", !hasSession());
+  document.body.classList.toggle("signed-out", !hasSession() || (hasSession() && !isDemoMode() && !hasPaid()));
   if (!state) {
     notaryIdentity.textContent = "One-time purchase notary journal";
     nextEntryNumber.textContent = "-";
@@ -615,6 +619,10 @@ function render() {
   renderShell();
   if (!hasSession()) {
     renderLanding();
+    return;
+  }
+  if (!isDemoMode() && !hasPaid()) {
+    renderUnlockScreen();
     return;
   }
   if (!state.onboardingComplete && currentView !== "settings") {
@@ -656,6 +664,23 @@ function renderLanding() {
   `;
 }
 
+function renderUnlockScreen() {
+  document.querySelectorAll(".nav-button").forEach((button) => button.classList.remove("active"));
+  app.innerHTML = `
+    <section class="unlock-card">
+      <p class="eyebrow">Full access</p>
+      <h2>Unlock Full Version</h2>
+      <p>Purchase Notary Ledger to unlock unlimited entries, encrypted backups, restore/import, and PDF exports.</p>
+      <div class="landing-actions">
+        <button class="button primary" data-action="mock-purchase" type="button">Buy Full Version</button>
+        <button class="button secondary" data-action="enter-license" type="button">Enter License Key</button>
+      </div>
+      <button class="text-link terms-link" data-action="open-terms" type="button">Refunds & Terms</button>
+      <button class="text-link account-switch" data-action="logout" type="button">Log out</button>
+    </section>
+  `;
+}
+
 function renderOnboarding() {
   app.innerHTML = `
     <section class="onboarding-card">
@@ -677,6 +702,7 @@ function renderOnboarding() {
 
 function renderDashboard() {
   const lockedCount = state.entries.length;
+  const canUseFullFeatures = hasPaid();
   app.innerHTML = `
     <section class="home-panel">
       <div>
@@ -689,10 +715,10 @@ function renderDashboard() {
     <section class="home-actions">
       <button class="quick-action" data-action="locked" type="button"><strong>Locked Entries</strong><span>Search and review records</span></button>
       <button class="quick-action" data-action="verify" type="button"><strong>Verify Integrity</strong><span>Check hashes and sequence</span></button>
-      <button class="quick-action" data-action="export-pdf" type="button"><strong>Export PDF</strong><span>Create journal report</span></button>
+      ${canUseFullFeatures ? `<button class="quick-action" data-action="export-pdf" type="button"><strong>Export PDF</strong><span>Create journal report</span></button>` : `<button class="quick-action" data-action="mock-purchase" type="button"><strong>Buy Full Version</strong><span>Unlock PDF and backups</span></button>`}
       <button class="quick-action" data-action="settings" type="button"><strong>Settings</strong><span>Profile, license, backup</span></button>
     </section>
-    ${!state.license?.unlocked && state.entries.length >= 1 ? `<section class="warning-card"><strong>Demo limit reached.</strong><span>Purchase Notary Ledger to unlock unlimited entries, encrypted backups, restore/import, and PDF exports.</span></section>` : ""}
+    ${!hasPaid() && state.entries.length >= 1 ? `<section class="warning-card"><strong>Demo limit reached.</strong><span>Purchase Notary Ledger to unlock unlimited entries, encrypted backups, restore/import, and PDF exports.</span></section>` : ""}
     <section class="notice-card">
       <strong>Locked entries cannot be edited.</strong>
       <span>Corrections must be added as separate correction records.</span>
@@ -933,6 +959,7 @@ function renderEntryDetail(entry) {
 
 function renderSettings() {
   const settings = state.settings;
+  const canUseFullFeatures = hasPaid();
   app.innerHTML = `
     <section class="settings-grid">
       <article class="form-card">
@@ -947,23 +974,23 @@ function renderSettings() {
         </div>
       </article>
       <article class="form-card">
-        <div class="section-heading"><div><p class="eyebrow">Testing</p><h2>Prototype Tools</h2></div></div>
+        <div class="section-heading"><div><p class="eyebrow">Account</p><h2>Account Tools</h2></div></div>
         <div class="account-box">
           <strong>${escapeHtml(currentUserEmail)}</strong>
-          <span>${state.license?.unlocked ? "Full license active" : "Limited mode: one locked entry before unlock"}</span>
+          <span>${canUseFullFeatures ? "Full version unlocked" : "Demo access: one locked entry before unlock"}</span>
         </div>
         ${
-          state.license?.unlocked
-            ? `<button class="button secondary full" data-action="export-encrypted" type="button">Export Encrypted Backup</button>`
-            : `<button class="button gold full" data-action="enter-license" type="button">Enter License Key</button><button class="button secondary full" data-action="mock-purchase" type="button">One-Time Purchase</button>`
+          canUseFullFeatures
+            ? `<button class="button secondary full" data-action="export-encrypted" type="button">Export Encrypted Backup</button>
+               <button class="button secondary full" data-action="restore-backup" type="button">Import / Restore Backup</button>
+               <button class="button secondary full" data-action="export-json" type="button">Export Backup File</button>
+               <button class="button secondary full" data-action="export-pdf" type="button">Export PDF Journal</button>`
+            : `<button class="button gold full" data-action="mock-purchase" type="button">Buy Full Version</button>
+               <button class="button secondary full" data-action="enter-license" type="button">Enter License Key</button>
+               <button class="button secondary full" data-action="demo" type="button">Load Demo Data</button>`
         }
-        <button class="button secondary full" data-action="restore-backup" type="button">Import / Restore Backup</button>
-        <button class="button gold full" data-action="demo" type="button">Load Sample Demo Data</button>
-        <button class="button secondary full" data-action="export-json" type="button">Export Backup File</button>
-        <button class="button secondary full" data-action="export-pdf" type="button">Export PDF Journal</button>
         <button class="button secondary full" data-action="logout" type="button">Log Out</button>
-        <button class="button danger full" data-action="reset-demo" type="button">Reset Prototype Data</button>
-        <p class="prototype-note">Prototype only. Not legally certified. Designed for tamper-evident electronic journal recordkeeping review.</p>
+        ${canUseFullFeatures ? `<button class="button danger full" data-action="reset-demo" type="button">Reset App Data</button>` : ""}
       </article>
     </section>
   `;
@@ -991,7 +1018,7 @@ function toCsv(entries) {
 }
 
 async function exportJson() {
-  if (!state.license?.unlocked && state.entries.length >= 1) {
+  if (!hasPaid()) {
     alert("Purchase Notary Ledger to unlock unlimited entries, encrypted backups, restore/import, and PDF exports.");
     return;
   }
@@ -1031,8 +1058,8 @@ function base64ToBytes(value) {
 }
 
 async function exportEncryptedBackup() {
-  if (!state.license?.unlocked) {
-    alert("Encrypted backups are a full-feature unlock in this prototype.");
+  if (!hasPaid()) {
+    alert("Purchase Notary Ledger to unlock unlimited entries, encrypted backups, restore/import, and PDF exports.");
     return;
   }
 
@@ -1048,7 +1075,7 @@ async function exportEncryptedBackup() {
   const plaintext = new TextEncoder().encode(JSON.stringify(state));
   const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, plaintext);
   const backup = {
-    app: "Notary Journal Prototype",
+    app: "Notary Ledger",
     version: APP_VERSION,
     encrypted: true,
     kdf: "PBKDF2-SHA256-250000",
@@ -1100,7 +1127,7 @@ async function importRestoreFile(file) {
 }
 
 async function exportCsv() {
-  if (!state.license?.unlocked && state.entries.length >= 1) {
+  if (!hasPaid()) {
     alert("Purchase Notary Ledger to unlock unlimited entries, encrypted backups, restore/import, and PDF exports.");
     return;
   }
@@ -1111,7 +1138,7 @@ async function exportCsv() {
 }
 
 async function exportPdf() {
-  if (!state.license?.unlocked && state.entries.length >= 1) {
+  if (!hasPaid()) {
     alert("Purchase Notary Ledger to unlock unlimited entries, encrypted backups, restore/import, and PDF exports.");
     return;
   }
@@ -1214,7 +1241,7 @@ async function loadDemoData() {
       },
     ],
     feeItems: { notarialFee: state.settings.defaultFee || "15.00", travelFee: state.settings.defaultTravelFee || "0.00", otherFee: "0.00" },
-    notes: "Sample entry for iPad testing.",
+    notes: "Sample entry for iPad review.",
     previousHash: state.entries.at(-1)?.entryHash ?? "GENESIS",
   };
 
@@ -1305,16 +1332,17 @@ async function enterLicenseKey() {
   if (!key) return;
   const normalized = key.trim().toUpperCase();
   if (!(await validateLicenseKeyWithServer(normalized))) {
-    alert("License key was not recognized in this prototype.");
+    alert("Invalid license key");
     return;
   }
+  localStorage.setItem("hasPaid", "true");
   state.license = {
     unlocked: true,
     licenseKey: normalized,
     unlockedAt: new Date().toISOString(),
   };
   saveState();
-  alert("Full features unlocked on this device.");
+  alert("Full version unlocked");
   render();
 }
 
@@ -1326,7 +1354,7 @@ function initiateStripeCheckout() {
   // Future Stripe setup note:
   // The Stripe product description should include:
   // "7-day refund period. One-time purchase. No subscription. Access may be revoked after refund. Support: digitalsolutionsco.us@gmail.com."
-  window.open("https://buy.stripe.com/bJe4gB2sD0DG8nhfdegIo00", "_blank", "noopener,noreferrer");
+  window.open("https://buy.stripe.com/7sY14p8R17249rl3uwgIo01", "_blank", "noopener,noreferrer");
 }
 
 function openTermsModal() {
@@ -1455,6 +1483,9 @@ function wireEvents() {
       const submit = document.querySelector("[data-action='auth-submit']");
       submit.dataset.mode = mode;
       submit.textContent = mode === "signup" ? "Create Account" : "Log In";
+      const switcher = document.querySelector("[data-auth-mode]");
+      document.querySelector(".account-switch").dataset.authMode = mode === "signup" ? "login" : "signup";
+      document.querySelector(".account-switch").textContent = mode === "signup" ? "Already have an account? Log in" : "Don't have an account? Create one";
     }
     if (target.dataset.action === "auth-submit") await handleAuth(target.dataset.mode);
     if (target.dataset.action === "open-terms") openTermsModal();
@@ -1481,7 +1512,7 @@ function wireEvents() {
       }
     }
     if (target.dataset.action === "reset-demo") {
-      if (confirm("Reset all prototype data on this device?")) {
+      if (confirm("Reset all app data on this device?")) {
         localStorage.removeItem(userStorageKey());
         state = loadState();
         draft = createDraft();

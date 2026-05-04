@@ -1,11 +1,12 @@
-const CACHE_NAME = "notary-ledger-prototype-v10";
+const CACHE_NAME = "notary-ledger-v11";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
-  "./icon.svg"
+  "./icon.svg",
+  "./refund-policy.html"
 ];
 
 self.addEventListener("install", (event) => {
