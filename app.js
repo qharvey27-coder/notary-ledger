@@ -1326,7 +1326,7 @@ function initiateStripeCheckout() {
   // Future Stripe setup note:
   // The Stripe product description should include:
   // "7-day refund period. One-time purchase. No subscription. Access may be revoked after refund. Support: digitalsolutionsco.us@gmail.com."
-  alert("Future Stripe hook: create a checkout session, collect one-time payment, then issue a unique license key. For this prototype, use license key LOCAL-TEST-UNLOCK.");
+  window.open("https://buy.stripe.com/bJe4gB2sD0DG8nhfdegIo00", "_blank", "noopener,noreferrer");
 }
 
 function openTermsModal() {
