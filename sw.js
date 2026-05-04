@@ -1,4 +1,4 @@
-const CACHE_NAME = "notary-ledger-prototype-v8";
+const CACHE_NAME = "notary-ledger-prototype-v9";
 const APP_SHELL = [
   "./",
   "./index.html",

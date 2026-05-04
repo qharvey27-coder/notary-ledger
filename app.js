@@ -35,9 +35,9 @@ const participantRoles = {
 };
 
 let auth = loadAuth();
-let currentUserEmail = localStorage.getItem(SESSION_KEY) || "";
-let state = currentUserEmail ? loadState() : null;
-let currentView = currentUserEmail ? "dashboard" : "landing";
+let currentUserEmail = "";
+let state = null;
+let currentView = "landing";
 let currentStep = 0;
 let draft = createDraft();
 let selectedEntryId = null;
@@ -1569,6 +1569,7 @@ function wireEvents() {
 }
 
 wireEvents();
+localStorage.removeItem(SESSION_KEY);
 setIpadMode(localStorage.getItem("notaryJournalPrototype.ipadMode") === "true");
 registerServiceWorker();
 updateNetworkStatus();
