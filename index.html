@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1f3a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Notary Journal" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Notary Journal Prototype</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Tamper-evident journal prototype</p>
+          <h1>Notary Ledger</h1>
+          <p id="notaryIdentity" class="identity"></p>
+        </div>
+        <div class="header-card">
+          <span>Next entry</span>
+          <strong id="nextEntryNumber">1</strong>
+        </div>
+      </header>
+
+      <section class="status-strip">
+        <div>
+          <strong id="offlineStatus">Checking offline support...</strong>
+          <span id="pwaStatus">Install from Safari Share, then Add to Home Screen.</span>
+        </div>
+        <button id="ipadModeToggle" class="button secondary" type="button">iPad Testing Mode</button>
+      </section>
+
+      <nav class="app-nav" aria-label="Primary">
+        <button class="nav-button active" data-view="dashboard" type="button">Home</button>
+        <button class="nav-button" data-view="new-entry" type="button">New Entry</button>
+        <button class="nav-button" data-view="locked" type="button">Locked Entries</button>
+        <button class="nav-button" data-view="settings" type="button">Settings</button>
+      </nav>
+
+      <main id="app"></main>
+
+      <footer class="app-footer">
+        Prototype only. Not legally certified. Designed for tamper-evident electronic journal recordkeeping review.
+      </footer>
+    </div>
+    <input id="restoreFileInput" type="file" accept=".json,.njbackup,application/json" hidden />
+
+    <div id="signatureModal" class="signature-modal" aria-hidden="true">
+      <div class="signature-card">
+        <div class="signature-modal-header">
+          <div>
+            <p class="eyebrow">Signature capture</p>
+            <h2 id="signatureTitle">Participant Signature</h2>
+          </div>
+          <button id="closeSignature" class="button secondary" type="button">Cancel</button>
+        </div>
+        <div class="signature-stage">
+          <canvas id="signaturePad" width="1200" height="620"></canvas>
+        </div>
+        <div class="signature-actions">
+          <button id="clearSignature" class="button secondary" type="button">Clear Signature</button>
+          <button id="confirmSignature" class="button primary" type="button">Confirm Signature</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

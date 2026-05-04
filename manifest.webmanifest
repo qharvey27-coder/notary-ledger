@@ -1,0 +1,19 @@
+{
+  "name": "Notary Journal Prototype",
+  "short_name": "Notary Journal",
+  "description": "Offline-capable notary journal prototype with locked entries, signatures, corrections, and hash verification.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f7fb",
+  "theme_color": "#0b1f3a",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
